@@ -16,94 +16,189 @@
 
 #include <iostream>
 #include <string>
-using namespace std;
+#include <vector>
 
-class Usuarios {
+class Vehiculo {
+ protected:
+  std::string tipo_;
+  bool alquilado_;
+
  public:
-  class UsuarioBasico {
-   protected:
-    string nombre;
-    string id;
+  Vehiculo(const std::string& tipo) : tipo_(tipo), alquilado_(false) {}
+  virtual ~Vehiculo() = default;
 
-   public:
-    UsuarioBasico(const string& nombre, const string& id) : nombre(nombre), id(id) {}
-    virtual void MostrarPermisos() {
-      cout << "Usuario básico: " << nombre << " - Permisos limitados." << endl;
-    }
-  };
+  virtual double CalcularCosto() const = 0;
+  virtual void MostrarInfo() const = 0;
 
-  class Operador : public UsuarioBasico {
-   public:
-    Operador(const string& nombre, const string& id) : UsuarioBasico(nombre, id) {}
-    void MostrarPermisos() override {
-      cout << "Operador: " << nombre << " - Permisos para gestionar vehículos y usuarios." << endl;
-    }
-  };
-
-  class Administrador : public UsuarioBasico {
-   public:
-    Administrador(const string& nombre, const string& id) : UsuarioBasico(nombre, id) {}
-    void MostrarPermisos() override {
-      cout << "Administrador: " << nombre << " - Permisos completos." << endl;
-    }
-  };
+  void Alquilar() { alquilado_ = true; }
+  void Devolver() { alquilado_ = false; }
+  bool EstaAlquilado() const { return alquilado_; }
+  std::string ObtenerTipo() const { return tipo_; }
 };
 
-class Vehiculos {
+class Coche : public Vehiculo {
+  double costo_diario_;
+  int dias_;
+
  public:
-  class Vehiculo {
-   protected:
-    string tipo;
-    double precio_base;
+  Coche(double costo_diario, int dias)
+      : Vehiculo("Coche"), costo_diario_(costo_diario), dias_(dias) {}
 
-   public:
-    Vehiculo(const string& tipo, double precio_base) : tipo(tipo), precio_base(precio_base) {}
-    virtual double CalcularPrecio(int unidad) = 0;
-    virtual void MostrarInfo() { cout << "Tipo: " << tipo << ", Precio base: " << precio_base << endl; }
-  };
+  double CalcularCosto() const override { return costo_diario_ * dias_; }
+  void MostrarInfo() const override {
+    std::cout << "Coche - Costo Diario: " << costo_diario_
+              << ", Dias: " << dias_ << "\n";
+  }
+};
 
-  class Caravana : public Vehiculo {
-   public:
-    Caravana(double precio_base) : Vehiculo("Caravana", precio_base) {}
-    double CalcularPrecio(int semanas) override { return precio_base * semanas; }
-  };
+class Motocicleta : public Vehiculo {
+  double costo_hora_;
+  int horas_;
 
-  class Coche : public Vehiculo {
-   public:
-    Coche(double precio_base) : Vehiculo("Coche", precio_base) {}
-    double CalcularPrecio(int dias) override { return precio_base * dias; }
-  };
+ public:
+  Motocicleta(double costo_hora, int horas)
+      : Vehiculo("Motocicleta"), costo_hora_(costo_hora), horas_(horas) {}
 
-  class Motocicleta : public Vehiculo {
-   public:
-    Motocicleta(double precio_base) : Vehiculo("Motocicleta", precio_base) {}
-    double CalcularPrecio(int dias) override { return precio_base * dias; }
-  };
+  double CalcularCosto() const override { return costo_hora_ * horas_; }
+  void MostrarInfo() const override {
+    std::cout << "Motocicleta - Costo Hora: " << costo_hora_
+              << ", Horas: " << horas_ << "\n";
+  }
+};
 
-  class Bicicleta : public Vehiculo {
-   public:
-    Bicicleta(double precio_base) : Vehiculo("Bicicleta", precio_base) {}
-    double CalcularPrecio(int horas) override { return precio_base * horas; }
-  };
+class Bicicleta : public Vehiculo {
+  double costo_hora_;
+  int horas_;
+
+ public:
+  Bicicleta(double costo_hora, int horas)
+      : Vehiculo("Bicicleta"), costo_hora_(costo_hora), horas_(horas) {}
+
+  double CalcularCosto() const override { return costo_hora_ * horas_; }
+  void MostrarInfo() const override {
+    std::cout << "Bicicleta - Costo Hora: " << costo_hora_
+              << ", Horas: " << horas_ << "\n";
+  }
+};
+
+class Caravana : public Vehiculo {
+  double costo_semanal_;
+  int semanas_;
+
+ public:
+  Caravana(double costo_semanal, int semanas)
+      : Vehiculo("Caravana"), costo_semanal_(costo_semanal), semanas_(semanas) {}
+
+  double CalcularCosto() const override { return costo_semanal_ * semanas_; }
+  void MostrarInfo() const override {
+    std::cout << "Caravana - Costo Semanal: " << costo_semanal_
+              << ", Semanas: " << semanas_ << "\n";
+  }
+};
+
+class Barco : public Vehiculo {
+  double costo_semanal_;
+  int semanas_;
+
+ public:
+  Barco(double costo_semanal, int semanas)
+      : Vehiculo("Barco"), costo_semanal_(costo_semanal), semanas_(semanas) {}
+
+  double CalcularCosto() const override { return costo_semanal_ * semanas_; }
+  void MostrarInfo() const override {
+    std::cout << "Barco - Costo Semanal: " << costo_semanal_
+              << ", Semanas: " << semanas_ << "\n";
+  }
+};
+
+class Usuario {
+ protected:
+  std::string nombre_;
+
+ public:
+  explicit Usuario(const std::string& nombre) : nombre_(nombre) {}
+  virtual ~Usuario() = default;
+
+  virtual void MostrarInfo() const = 0;
+  std::string ObtenerNombre() const { return nombre_; }
+};
+
+class Cliente : public Usuario {
+ public:
+  explicit Cliente(const std::string& nombre) : Usuario(nombre) {}
+
+  void MostrarInfo() const override {
+    std::cout << "Cliente: " << nombre_ << "\n";
+  }
+};
+
+class Administrador : public Usuario {
+ public:
+  explicit Administrador(const std::string& nombre) : Usuario(nombre) {}
+
+  void MostrarInfo() const override {
+    std::cout << "Administrador: " << nombre_ << "\n";
+  }
+};
+
+class Operador : public Usuario {
+ public:
+  explicit Operador(const std::string& nombre) : Usuario(nombre) {}
+
+  void MostrarInfo() const override {
+    std::cout << "Operador: " << nombre_ << "\n";
+  }
+};
+
+class AgenciaViaje : public Usuario {
+ public:
+  explicit AgenciaViaje(const std::string& nombre) : Usuario(nombre) {}
+
+  void MostrarInfo() const override {
+    std::cout << "Agencia de Viaje: " << nombre_ << "\n";
+  }
 };
 
 int main() {
-  Usuarios::UsuarioBasico usuario1("Juan", "U001");
-  Usuarios::Operador operador1("María", "O001");
-  Usuarios::Administrador admin1("Carlos", "A001");
+  std::vector<Vehiculo*> vehiculos;
+  std::vector<Usuario*> usuarios;
 
-  usuario1.MostrarPermisos();
-  operador1.MostrarPermisos();
-  admin1.MostrarPermisos();
+  vehiculos.push_back(new Coche(50.0, 5));
+  vehiculos.push_back(new Motocicleta(10.0, 3));
+  vehiculos.push_back(new Bicicleta(5.0, 4));
+  vehiculos.push_back(new Caravana(300.0, 2));
+  vehiculos.push_back(new Barco(500.0, 1));
 
-  Vehiculos::Caravana caravana(500);
-  Vehiculos::Coche coche(50);
-  Vehiculos::Motocicleta moto(30);
-  Vehiculos::Bicicleta bici(5);
+  usuarios.push_back(new Cliente("Juan Perez"));
+  usuarios.push_back(new Administrador("Maria Lopez"));
+  usuarios.push_back(new Operador("Carlos Ruiz"));
+  usuarios.push_back(new AgenciaViaje("TravelNow"));
 
-  cout << "Precio de alquilar la caravana 2 semanas: " << caravana.CalcularPrecio(2) << " euros" << endl;
-  cout << "Precio de alquilar el coche 3 días: " << coche.CalcularPrecio(3) << " euros" << endl;
-  cout << "Precio de alquilar la moto 5 días: " << moto.CalcularPrecio(5) << " euros" << endl;
-  cout << "Precio de alquilar la bicicleta 4 horas: " << bici.CalcularPrecio(4) << " euros" << endl;
+  double ingresos_esperados = 0.0;
+
+  for (auto vehiculo : vehiculos) {
+    if (!vehiculo->EstaAlquilado()) {
+      vehiculo->Alquilar();
+      ingresos_esperados += vehiculo->CalcularCosto();
+    }
+  }
+
+  std::cout << "Ingresos Esperados: " << ingresos_esperados << "\n";
+  std::cout << "Vehiculos Sin Alquilar:\n";
+
+  for (auto vehiculo : vehiculos) {
+    if (!vehiculo->EstaAlquilado()) {
+      vehiculo->MostrarInfo();
+    }
+  }
+
+  for (auto vehiculo : vehiculos) {
+    delete vehiculo;
+  }
+
+  for (auto usuario : usuarios) {
+    delete usuario;
+  }
+
   return 0;
 }
